@@ -93,3 +93,4 @@ defmodule Explorer.Chain.CsvExport.Addresses do
 
   defp address_reputation_if_loaded(%Address{reputation: %Reputation{reputation: reputation}}), do: reputation
   defp address_reputation_if_loaded(_), do: "ok"
+end
