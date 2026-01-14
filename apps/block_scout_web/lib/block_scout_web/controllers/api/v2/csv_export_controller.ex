@@ -15,10 +15,12 @@ defmodule BlockScoutWeb.API.V2.CsvExportController do
   alias Explorer.Chain.CsvExport.Address.Celo.ElectionRewards,
     as: AddressCeloElectionRewardsCsvExporter
 
+  alias Explorer.Chain.CsvExport.Addresses, as: AddressesCsvExporter
   alias Explorer.Chain.CsvExport.Helper, as: CsvHelper
   alias Plug.Conn
 
-  import BlockScoutWeb.Chain, only: [fetch_scam_token_toggle: 2]
+  import BlockScoutWeb.Chain, only: [fetch_scam_token_toggle: 2, paging_options: 1]
+  import BlockScoutWeb.PagingHelper, only: [addresses_sorting: 1]
 
   action_fallback(BlockScoutWeb.API.V2.FallbackController)
 
@@ -315,5 +317,55 @@ defmodule BlockScoutWeb.API.V2.CsvExportController do
   @spec celo_election_rewards_csv(Conn.t(), map()) :: Conn.t()
   def celo_election_rewards_csv(conn, params) do
     items_csv(conn, params, AddressCeloElectionRewardsCsvExporter)
+  end
+
+  operation :addresses_list_csv,
+    summary: "Export addresses list as CSV",
+    description: "Exports the list of addresses holding native coins as a CSV file.",
+    parameters:
+      base_params() ++
+        [
+          sort_param(["balance", "transactions_count"]),
+          order_param()
+        ] ++
+        define_paging_params(["fetched_coin_balance", "address_hash", "items_count", "transactions_count"]),
+    responses: [
+      ok: {"CSV file of addresses list.", "application/csv", nil},
+      unprocessable_entity: JsonErrorResponse.response()
+    ],
+    tags: ["addresses"]
+
+  @doc """
+  Exports addresses list as a CSV file.
+
+  ## Parameters
+
+    - `conn`: The Plug connection.
+    - `params`: A map containing request parameters.
+
+  ## Returns
+
+    - The updated Plug connection with the CSV response.
+
+  This endpoint delegates CSV generation to `AddressesCsvExporter`.
+  """
+  @spec addresses_list_csv(Conn.t(), map()) :: Conn.t()
+  def addresses_list_csv(conn, params) do
+    options =
+      params
+      |> paging_options()
+      |> Keyword.merge(@api_true)
+      |> Keyword.merge(addresses_sorting(params))
+
+    AddressesCsvExporter.export(options)
+    |> Enum.reduce_while(put_resp_params(conn), fn chunk, conn ->
+      case Conn.chunk(conn, chunk) do
+        {:ok, conn} ->
+          {:cont, conn}
+
+        {:error, :closed} ->
+          {:halt, conn}
+      end
+    end)
   end
 end
