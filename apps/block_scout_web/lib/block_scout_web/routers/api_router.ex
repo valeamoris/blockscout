@@ -237,6 +237,7 @@ defmodule BlockScoutWeb.Routers.ApiRouter do
 
     scope "/addresses" do
       get("/", V2.AddressController, :addresses_list)
+      get("/csv", V2.CsvExportController, :addresses_list_csv)
       get("/:address_hash_param", V2.AddressController, :address)
       get("/:address_hash_param/tabs-counters", V2.AddressController, :tabs_counters)
       get("/:address_hash_param/counters", V2.AddressController, :counters)
