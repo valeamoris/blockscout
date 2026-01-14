@@ -25,9 +25,7 @@ jobs:
         id: setup
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          docker-remote-multi-platform: true
-          docker-arm-host: ${{ secrets.ARM_RUNNER_HOSTNAME }}
-          docker-arm-host-key: ${{ secrets.ARM_RUNNER_KEY }}
+          docker-remote-multi-platform: false
 
       - name: Set source and target tags
         run: |

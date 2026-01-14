@@ -26,9 +26,7 @@ jobs:
         id: setup
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          docker-remote-multi-platform: true
-          docker-arm-host: ${{ secrets.ARM_RUNNER_HOSTNAME }}
-          docker-arm-host-key: ${{ secrets.ARM_RUNNER_KEY }}
+          docker-remote-multi-platform: false
 
       - name: Build & Push Core Docker image (indexer + API)
         uses: docker/build-push-action@v6
@@ -42,7 +40,6 @@ jobs:
           labels: ${{ steps.setup.outputs.docker-labels }}
           platforms: |
             linux/amd64
-            linux/arm64/v8
           build-args: |
             DECODE_NOT_A_CONTRACT_CALLS=false
             MIXPANEL_URL=
@@ -64,7 +61,6 @@ jobs:
           labels: ${{ steps.setup.outputs.docker-labels }}
           platforms: |
             linux/amd64
-            linux/arm64/v8
           build-args: |
             DISABLE_API=true
             DECODE_NOT_A_CONTRACT_CALLS=false
@@ -88,7 +84,6 @@ jobs:
           labels: ${{ steps.setup.outputs.docker-labels }}
           platforms: |
             linux/amd64
-            linux/arm64/v8
           build-args: |
             DECODE_NOT_A_CONTRACT_CALLS=false
             MIXPANEL_URL=
