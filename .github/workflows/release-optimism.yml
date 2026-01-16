@@ -16,7 +16,7 @@ env:
 jobs:
   push_to_registry:
     name: Push Docker image to GitHub Container Registry
-    runs-on: build
+    runs-on: ubuntu-latest
     env:
       RELEASE_VERSION: 9.3.2
     steps:
@@ -34,7 +34,7 @@ jobs:
           context: .
           file: ./docker/Dockerfile
           push: true
-          tags: ghcr.io/blockscout/blockscout-optimism-private:latest, ghcr.io/blockscout/blockscout-optimism-private:${{ env.RELEASE_VERSION }}
+          tags: ghcr.io/valeamoris/blockscout-optimism-private:latest, ghcr.io/valeamoris/blockscout-optimism-private:${{ env.RELEASE_VERSION }}
           labels: ${{ steps.setup.outputs.docker-labels }}
           platforms: |
             linux/amd64
@@ -49,7 +49,7 @@ jobs:
           context: .
           file: ./docker/Dockerfile
           push: true
-          tags: ghcr.io/blockscout/blockscout-optimism-private:${{ env.RELEASE_VERSION }}-indexer
+          tags: ghcr.io/valeamoris/blockscout-optimism-private:${{ env.RELEASE_VERSION }}-indexer
           labels: ${{ steps.setup.outputs.docker-labels }}
           platforms: |
             linux/amd64
