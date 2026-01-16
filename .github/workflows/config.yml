@@ -4,21 +4,7 @@ on:
   push:
     branches:
       - master
-      - production-arbitrum
-      - production-core
-      - production-eth-sepolia
-      - production-filecoin
-      - production-fuse
       - production-optimism
-      - production-immutable
-      - production-iota
-      - production-lukso
-      - production-rsk
-      - production-sokol
-      - production-xdai
-      - production-zkevm
-      - production-zksync
-      - staging-l2
     paths-ignore:
       - "CHANGELOG.md"
       - "**/README.md"
@@ -51,28 +37,13 @@ jobs:
             // Add/remove CI matrix chain types here
             const chainTypes = [
               "default",
-              "arbitrum",
-              "arc",
-              "blackfort",
-              "ethereum",
-              "filecoin",
               "optimism",
-              "optimism-celo",
-              "polygon_zkevm",
-              "rsk",
-              "scroll",
-              "shibarium",
-              "stability",
-              "zetachain",
-              "zilliqa",
-              "zksync",
-              "neon"
+              "optimism-celo"
             ];
 
             // Add/remove CI matrix chain types for "ci:core" label here
             const coreChainTypes = [
               "default",
-              "ethereum",
               "optimism",
               "optimism-celo"
             ];
