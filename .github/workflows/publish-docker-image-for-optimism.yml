@@ -23,7 +23,6 @@ jobs:
         id: setup
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          docker-remote-multi-platform: false
 
       - name: Build and push Docker image (indexer + API)
         uses: docker/build-push-action@v6
