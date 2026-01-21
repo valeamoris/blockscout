@@ -5,7 +5,7 @@ defmodule Explorer.Chain.CsvExport.Addresses do
 
   alias Ecto.Association.NotLoaded
   alias Explorer.Chain.Address
-  alias Explorer.Chain.Address.{Name, Reputation}
+  alias Explorer.Chain.Address.Name
   alias Explorer.Chain.CsvExport.Helper
 
   @spec export(Keyword.t()) :: Enumerable.t()
@@ -22,7 +22,6 @@ defmodule Explorer.Chain.CsvExport.Addresses do
           :names => :optional,
           :smart_contract => :optional,
           :scam_badge => :optional,
-          :reputation => :optional,
           :token => :optional
         }
       ]
@@ -41,8 +40,7 @@ defmodule Explorer.Chain.CsvExport.Addresses do
       "Transactions Count",
       "Is Contract",
       "Name",
-      "Is Scam",
-      "Reputation"
+      "Is Scam"
     ]
 
     address_lists =
@@ -54,8 +52,7 @@ defmodule Explorer.Chain.CsvExport.Addresses do
           format_transactions_count(address.transactions_count),
           Address.smart_contract?(address),
           address_name(address),
-          address_marked_as_scam?(address),
-          address_reputation(address)
+          address_marked_as_scam?(address)
         ]
       end)
 
@@ -86,11 +83,4 @@ defmodule Explorer.Chain.CsvExport.Addresses do
   defp address_marked_as_scam?(%Address{scam_badge: %NotLoaded{}}), do: false
   defp address_marked_as_scam?(%Address{scam_badge: scam_badge}) when not is_nil(scam_badge), do: true
   defp address_marked_as_scam?(_), do: false
-
-  defp address_reputation(%Address{scam_badge: %NotLoaded{}}), do: address_reputation_if_loaded(%Address{})
-  defp address_reputation(%Address{scam_badge: scam_badge}) when not is_nil(scam_badge), do: "scam"
-  defp address_reputation(address), do: address_reputation_if_loaded(address)
-
-  defp address_reputation_if_loaded(%Address{reputation: %Reputation{reputation: reputation}}), do: reputation
-  defp address_reputation_if_loaded(_), do: "ok"
 end
