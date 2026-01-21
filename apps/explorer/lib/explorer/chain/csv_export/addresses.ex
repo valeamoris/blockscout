@@ -5,7 +5,7 @@ defmodule Explorer.Chain.CsvExport.Addresses do
 
   alias Ecto.Association.NotLoaded
   alias Explorer.Chain.Address
-  alias Explorer.Chain.Address.{Name, Reputation}
+  alias Explorer.Chain.Address.Name
   alias Explorer.Chain.CsvExport.Helper
 
   @spec export(Keyword.t()) :: Enumerable.t()
@@ -28,26 +28,9 @@ defmodule Explorer.Chain.CsvExport.Addresses do
 
     addresses = Address.list_top_addresses(full_options)
 
-    # Manually preload reputation since it's an embedded schema and can't be preloaded via join_associations
-    addresses_with_reputation = preload_reputation(addresses)
-
-    addresses_with_reputation
+    addresses
     |> to_csv_format()
     |> Helper.dump_to_stream()
-  end
-
-  defp preload_reputation(addresses) do
-    address_hashes = Enum.map(addresses, & &1.hash)
-
-    hash_to_reputation =
-      address_hashes
-      |> Reputation.preload_reputation()
-      |> Map.new()
-
-    Enum.map(addresses, fn address ->
-      reputation = Map.get(hash_to_reputation, address.hash)
-      %{address | reputation: reputation}
-    end)
   end
 
   defp to_csv_format(addresses) do
@@ -57,8 +40,7 @@ defmodule Explorer.Chain.CsvExport.Addresses do
       "Transactions Count",
       "Is Contract",
       "Name",
-      "Is Scam",
-      "Reputation"
+      "Is Scam"
     ]
 
     address_lists =
@@ -70,8 +52,7 @@ defmodule Explorer.Chain.CsvExport.Addresses do
           format_transactions_count(address.transactions_count),
           Address.smart_contract?(address),
           address_name(address),
-          address_marked_as_scam?(address),
-          address_reputation(address)
+          address_marked_as_scam?(address)
         ]
       end)
 
@@ -102,21 +83,4 @@ defmodule Explorer.Chain.CsvExport.Addresses do
   defp address_marked_as_scam?(%Address{scam_badge: %NotLoaded{}}), do: false
   defp address_marked_as_scam?(%Address{scam_badge: scam_badge}) when not is_nil(scam_badge), do: true
   defp address_marked_as_scam?(_), do: false
-
-  # Reputation logic matches Helper.address_with_info: if scam_badge exists, return "scam", otherwise check reputation
-  defp address_reputation(%Address{scam_badge: scam_badge}) when not is_nil(scam_badge) do
-    "scam"
-  end
-
-  defp address_reputation(address) do
-    address_reputation_if_loaded(address)
-  end
-
-  defp address_reputation_if_loaded(%Address{reputation: %Reputation{reputation: reputation}}) do
-    reputation
-  end
-
-  defp address_reputation_if_loaded(_) do
-    "ok"
-  end
 end
