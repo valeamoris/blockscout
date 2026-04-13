@@ -357,7 +357,8 @@ defmodule BlockScoutWeb.API.V2.CsvExportController do
       |> Keyword.merge(paging_options: CsvHelper.paging_options())
       |> Keyword.merge(addresses_sorting(params))
 
-    AddressesCsvExporter.export(options)
+    options
+    |> AddressesCsvExporter.export()
     |> Enum.reduce_while(put_resp_params(conn), fn chunk, conn ->
       case Conn.chunk(conn, chunk) do
         {:ok, conn} ->
