@@ -353,8 +353,8 @@ defmodule BlockScoutWeb.API.V2.CsvExportController do
   @spec addresses_list_csv(Conn.t(), map()) :: Conn.t()
   def addresses_list_csv(conn, params) do
     options =
-      [paging_options: CsvHelper.paging_options()]
-      |> Keyword.merge(@api_true)
+      @api_true
+      |> Keyword.merge(paging_options: CsvHelper.paging_options())
       |> Keyword.merge(addresses_sorting(params))
 
     AddressesCsvExporter.export(options)

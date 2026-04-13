@@ -66,7 +66,7 @@ defmodule Explorer.Chain.CsvExport.Addresses do
   defp format_transactions_count(nil), do: "0"
   defp format_transactions_count(count), do: to_string(count)
 
-  defp address_name(%Address{names: names}) when is_list(names) and length(names) > 0 do
+  defp address_name(%Address{names: [_ | _] = names}) do
     case Enum.find(names, &(&1.primary == true)) do
       nil ->
         # take last created address name, if there is no `primary` one.
