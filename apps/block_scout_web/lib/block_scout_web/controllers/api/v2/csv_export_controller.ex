@@ -329,7 +329,8 @@ defmodule BlockScoutWeb.API.V2.CsvExportController do
         [
           sort_param(["balance", "transactions_count"]),
           order_param()
-        ],
+        ] ++
+        define_paging_params(["fetched_coin_balance", "address_hash", "items_count", "transactions_count"]),
     responses: [
       ok: {"CSV file of addresses list.", "application/csv", nil},
       unprocessable_entity: JsonErrorResponse.response()
