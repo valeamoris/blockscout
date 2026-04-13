@@ -19,7 +19,7 @@ defmodule BlockScoutWeb.API.V2.CsvExportController do
   alias Explorer.Chain.CsvExport.Helper, as: CsvHelper
   alias Plug.Conn
 
-  import BlockScoutWeb.Chain, only: [fetch_scam_token_toggle: 2, paging_options: 1]
+  import BlockScoutWeb.Chain, only: [fetch_scam_token_toggle: 2]
   import BlockScoutWeb.PagingHelper, only: [addresses_sorting: 1]
 
   action_fallback(BlockScoutWeb.API.V2.FallbackController)
@@ -321,14 +321,15 @@ defmodule BlockScoutWeb.API.V2.CsvExportController do
 
   operation :addresses_list_csv,
     summary: "Export addresses list as CSV",
-    description: "Exports the list of addresses holding native coins as a CSV file.",
+    description:
+      "Exports up to CSV_EXPORT_LIMIT native coin holders (default 10000), with optional sort/order " <>
+        "like GET /api/v2/addresses. Configure the limit via the CSV_EXPORT_LIMIT environment variable.",
     parameters:
       base_params() ++
         [
           sort_param(["balance", "transactions_count"]),
           order_param()
-        ] ++
-        define_paging_params(["fetched_coin_balance", "address_hash", "items_count", "transactions_count"]),
+        ],
     responses: [
       ok: {"CSV file of addresses list.", "application/csv", nil},
       unprocessable_entity: JsonErrorResponse.response()
@@ -352,8 +353,7 @@ defmodule BlockScoutWeb.API.V2.CsvExportController do
   @spec addresses_list_csv(Conn.t(), map()) :: Conn.t()
   def addresses_list_csv(conn, params) do
     options =
-      params
-      |> paging_options()
+      [paging_options: CsvHelper.paging_options()]
       |> Keyword.merge(@api_true)
       |> Keyword.merge(addresses_sorting(params))
 
